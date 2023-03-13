@@ -12,6 +12,7 @@ data AST =
     | Sum AST AST
     | PrintAST AST
     | Var AST
+    | End
     deriving Show
 
 tokenize :: String -> [Token]
@@ -25,6 +26,24 @@ tokenize (c:cs)
                     "print" -> Print : tokenize cs'
                     _ -> Id (c:i) : tokenize cs'
     | otherwise = error $ "unexpected character " ++ show c 
+
+
+lookahead :: [Token] -> Maybe Token
+lookahead (tk:_) = Just tk
+lookahead [] = Nothing
+
+parseS :: [Token] -> AST
+parseS tks = case lookahead tks of
+  Just Print -> let (_:tks') = tks in PrintAST (parseE tks)
+  _ -> error "parsing exception"
+
+parseE :: [Token] -> AST
+parseE tks = case lookahead tks of
+  Just Id s -> Var 
+
+parse :: [Token] -> AST
+parse [] = End
+
 
 
 main = print (tokenize "print 1+1")
